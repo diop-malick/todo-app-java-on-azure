@@ -42,6 +42,10 @@ node('master') {
 
     stage('Docker Image') {
         withDockerRegistry([credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]) {
+            sh """
+                pwd
+            """
+
             dir('target') {
                 sh """
                     pwd
