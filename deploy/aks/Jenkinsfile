@@ -87,6 +87,7 @@ node('master') {
     }
 
     stage('Deploy') {
+        echo sh(returnStdout: true, script: 'env')
         // Apply the deployments to AKS.
         // With enableConfigSubstitution set to true, the variables ${TARGET_ROLE}, ${IMAGE_TAG}, ${KUBERNETES_SECRET_NAME}
         // will be replaced with environment variable values
