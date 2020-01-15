@@ -42,18 +42,9 @@ node('master') {
 
     stage('Docker Image') {
         withDockerRegistry([credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]) {
-            sh """
-                echo "=========== check repo root"
-                pwd
-                ls -la
-                cp -R deploy target/
-            """
             dir('target') {
                 sh """
-                    echo "=========== check repo target"
-                    pwd
-                    ls -la
-                    cp -f deploy/aks/Dockerfile .
+                    cp -f ../deploy/aks/Dockerfile .
                     docker build -t "${env.IMAGE_TAG}" .
                     docker push "${env.IMAGE_TAG}"
                 """
@@ -90,9 +81,9 @@ node('master') {
         env.TARGET_ROLE = newEnvironment()
 
         // clean the inactive environment
-        sh """
-        kubectl --kubeconfig=kubeconfig delete deployment "todoapp-deployment-\$TARGET_ROLE"
-        """
+        // sh """
+        // kubectl --kubeconfig=kubeconfig delete deployment "todoapp-deployment-\$TARGET_ROLE"
+        // """
     }
 
     stage('Deploy') {
@@ -102,7 +93,7 @@ node('master') {
         acsDeploy azureCredentialsId: servicePrincipalId,
                   resourceGroupName: resourceGroup,
                   containerService: "${aks} | AKS",
-                  configFilePaths: 'src/aks/deployment.yml',
+                  configFilePaths: 'deploy/aks/deployment.yml',
                   enableConfigSubstitution: true,
                   secretName: dockerRegistry,
                   containerRegistryCredentials: [[credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]]
@@ -139,7 +130,7 @@ node('master') {
         acsDeploy azureCredentialsId: servicePrincipalId,
                   resourceGroupName: resourceGroup,
                   containerService: "${aks} | AKS",
-                  configFilePaths: 'src/aks/service.yml',
+                  configFilePaths: 'deploy/aks/service.yml',
                   enableConfigSubstitution: true
     }
 
