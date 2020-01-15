@@ -43,13 +43,17 @@ node('master') {
     stage('Docker Image') {
         withDockerRegistry([credentialsId: dockerCredentialId, url: "http://${dockerRegistry}"]) {
             sh """
+                echo "=========== check repo root"
                 pwd
+                ls -la
+                cp -R deploy target/
             """
-
             dir('target') {
                 sh """
+                    echo "=========== check repo target"
                     pwd
-                    cp -f ../src/aks/Dockerfile .
+                    ls -la
+                    cp -f deploy/aks/Dockerfile .
                     docker build -t "${env.IMAGE_TAG}" .
                     docker push "${env.IMAGE_TAG}"
                 """
